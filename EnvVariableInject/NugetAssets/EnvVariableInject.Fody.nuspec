@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="2.8">
+    <id>EnvVariableInject.Fody</id>
+    <version>$version$</version>
+    <title>EnvVariableInject.Fody</title>
+    <authors>Nicholas Donohoe</authors>
+    <owners>Nicholas Donohoe</owners>
+    <developmentDependency>true</developmentDependency>
+    <licenseUrl></licenseUrl>
+    <projectUrl></projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Fody add-in for injecting build time environment variables into const, static and instance fields</description>
+    <language>en-GB</language>
+    <tags>Inject, ILWeaving, Build Environment, Fody, Cecil</tags>
+    <dependencies>
+      <dependency id="Fody" version ="1.29.2"/>
+    </dependencies>
+  </metadata>
+</package>
