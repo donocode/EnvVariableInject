@@ -2,13 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="2.8">
     <id>EnvVariableInject.Fody</id>
-    <version>$version$</version>
+    <version>0.0.1-rc</version>
     <title>EnvVariableInject.Fody</title>
     <authors>Nicholas Donohoe</authors>
     <owners>Nicholas Donohoe</owners>
     <developmentDependency>true</developmentDependency>
-    <licenseUrl></licenseUrl>
-    <projectUrl></projectUrl>
+    <licenseUrl>https://raw.githubusercontent.com/bonyjoe/EnvVariableInject/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/bonyjoe/EnvVariableInject</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Fody add-in for injecting build time environment variables into const, static and instance fields</description>
     <language>en-GB</language>
