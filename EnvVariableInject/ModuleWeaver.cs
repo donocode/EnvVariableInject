@@ -11,15 +11,20 @@ namespace EnvVariableInect
     public class ModuleWeaver
     {
         public Action<string> LogInfo { get; set; }
+        public Action<string> LogWarning { get; set; }
+        public Action<string> LogDebug { get; set; }
         public ModuleDefinition ModuleDefinition { get; set; }
 
         public ModuleWeaver()
         {
             LogInfo = s => { };
+            LogWarning = s => { };
+            LogDebug = m => { };
         }
 
         public void Execute()
         {
+            LogDebug("started");
             foreach (var typeDefinition in ModuleDefinition.Types.Where(x => x.HasFields))
             {
                 Dictionary<string, string> variableDict = GetReplacementFieldsForType(typeDefinition);
@@ -27,8 +32,9 @@ namespace EnvVariableInect
             }
         }
 
-        private static Dictionary<string, string> GetReplacementFieldsForType(TypeDefinition typeDefinition)
+        private Dictionary<string, string> GetReplacementFieldsForType(TypeDefinition typeDefinition)
         {
+            LogDebug($"Get Fields to replace for type {typeDefinition.FullName}");
             var variableDict = new Dictionary<string, string>();
             var attributeType = typeof(BuildTimeEnvironmentVariableAttribute);
             var replaceFields = typeDefinition.Fields.Where(x => x.HasCustomAttributes && x.CustomAttributes.ContainsAttribute(attributeType));
@@ -43,6 +49,7 @@ namespace EnvVariableInect
 
                     if (field.Attributes.HasFlag(FieldAttributes.Literal))
                     {
+                        LogDebug($"Const {field.Name} - {field.FieldType} - {variableValue}");
                         field.Constant = ConvertReplacement(field.FieldType, variableValue);
                     }
                     else if (variableValue != null)
@@ -52,11 +59,17 @@ namespace EnvVariableInect
                 }
             }
 
+            foreach (var kvp in variableDict)
+            {
+                LogDebug($"Variable Set : {kvp.Key} - {kvp.Value}");
+            }
+
             return variableDict;
         }
 
-        private static void ReplaceFieldsForType(TypeDefinition typeDefinition, Dictionary<string, string> variableDict)
+        private void ReplaceFieldsForType(TypeDefinition typeDefinition, Dictionary<string, string> variableDict)
         {
+            LogDebug($"Replace fields for type {typeDefinition.FullName} - {variableDict.Count} fields to replace");
             var constructors = typeDefinition.Methods.Where(x => x.IsConstructor && x.HasBody);
 
             foreach (var ctor in constructors)
@@ -77,12 +90,12 @@ namespace EnvVariableInect
                         continue;
                     }
 
-                    ReplaceValue(instruction, value);
+                    ReplaceValue(instruction, value, field.FullName);
                 }
             }
         }
 
-        private static void ReplaceValue(Mono.Cecil.Cil.Instruction instruction, string value)
+        private void ReplaceValue(Mono.Cecil.Cil.Instruction instruction, string value, string fieldName)
         {
             var previous = instruction.Previous;
 
@@ -92,28 +105,54 @@ namespace EnvVariableInect
                 return;
             }
 
-            if(previous.Operand == null)
+            if (previous.OpCode == Mono.Cecil.Cil.OpCodes.Ldnull && value != null)
+            {
+                previous.OpCode = Mono.Cecil.Cil.OpCodes.Ldstr;
+            }
+            else if (previous.Operand == null)
             {
                 return;
             }
 
-            var operandType = previous.Operand.GetType();
+            var operandType = previous.Operand != null ? previous.Operand.GetType() : typeof(string);
             object replacement = ConvertReplacement(operandType, value);
 
-            previous.Operand = replacement;
+            if(replacement != null)
+            {
+                previous.Operand = replacement;
+            }
+            else
+            {
+                LogWarning($"Value to set field {fieldName} is null, check the desired environment variable is set");
+            }
         }
 
-        private static object ConvertReplacement(TypeReference typeRef, string value)
+        private object ConvertReplacement(TypeReference typeRef, string value)
         {
             var typeName = $"{typeRef.FullName}, {typeRef.Scope.Name}";
+            LogDebug($"Attempting to get Type {typeName}");
+
             var type = Type.GetType(typeName);
+            if(type == null)
+            {
+                // if pcl dll being used may actually be mscorlib and not System.Runtime.dll
+                typeName = typeName.Replace("System.Runtime", "mscorlib");
+                LogDebug($"Attempting to get Type {typeName}");
+                type = type ?? Type.GetType(typeName);
+            }
 
             return ConvertReplacement(type, value);
         }
 
-        private static object ConvertReplacement(Type type, string value)
+        private object ConvertReplacement(Type type, string value)
         {
-            return type != typeof(string) ? type != typeof(bool) ? Convert.ChangeType(value, type) : value.AsBool() : value;
+            LogDebug($"Convert replacement - {value} - to {type?.Name ?? "type null"}");
+
+            if ((value == null && type.IsClass) || type == typeof(string)) return value;
+
+            if (type == typeof(bool)) return value.AsBool();
+
+            return Convert.ChangeType(value, type);
         }
     }
 }

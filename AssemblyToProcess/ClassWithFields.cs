@@ -73,6 +73,9 @@ namespace AssemblyToProcess
         [BuildTimeEnvironmentVariable("ConstBoolNumber")]
         public const bool ConstBoolNumber = true;
 
+        [BuildTimeEnvironmentVariable("InstanceStringNull")]
+        public string InstanceStringNull = null;
+
         public ClassWithFields()
         {
 

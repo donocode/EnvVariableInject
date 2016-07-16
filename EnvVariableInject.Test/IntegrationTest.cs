@@ -31,6 +31,7 @@ namespace EnvVariableInect.Test
             ["ConstDouble"] = "22.22",
             ["ConstBoolWord"] = "false",
             ["ConstBoolNumber"] = "0",
+            ["InstanceStringNull"] = "InstanceStringNull"
         };
 
         Assembly assembly;
@@ -160,6 +161,15 @@ namespace EnvVariableInect.Test
             var fieldValue = GetFieldValue("AssemblyToProcess.ClassWithFields", field);
 
             Assert.AreEqual(false, fieldValue);
+        }
+
+        [Test]
+        public void ShouldReplaceNull()
+        {
+            var instance = ConstructClass("AssemblyToProcess.ClassWithFields");
+            var fieldValue = GetFieldValue("AssemblyToProcess.ClassWithFields", "InstanceStringNull", instance);
+
+            Assert.AreEqual("InstanceStringNull", fieldValue);
         }
 
         private dynamic ConstructClass(string className)

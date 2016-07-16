@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="2.8">
     <id>EnvVariableInject.Fody</id>
-    <version>0.0.1-rc</version>
+    <version>0.0.6-rc</version>
     <title>EnvVariableInject.Fody</title>
     <authors>Nicholas Donohoe</authors>
     <owners>Nicholas Donohoe</owners>
@@ -17,4 +17,10 @@
       <dependency id="Fody" version ="1.29.2"/>
     </dependencies>
   </metadata>
+  <files>
+    <file src="..\bin\Release\EnvVariableInject.Fody.dll" target="" />
+    <file src="BuildTimeEnvironmentVariableAttribute.cs.pp" target="content" />
+    <file src="install.ps" target="tools"/>
+    <file src="uninstall.ps" target="tools"/>
+  </files>
 </package>
