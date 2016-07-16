@@ -18,6 +18,8 @@ If the ModuleWeavers.xml file is not updated automatically then edit to add EnvV
 </Weavers>
 ```
 
+This package is dependent upon [Fody](https://github.com/Fody/Fody)
+
 ## Usage
 
 ```csharp
@@ -43,7 +45,7 @@ variable specified in the Attribute constructor
 
 The following will not work with the Release Build Configuration
 
-```
+```csharp
 [BuildTimeEnvironmentVariable("TestString")]
 public string TestString;
 
@@ -56,5 +58,3 @@ This is because the compiler removes the instruction to set the field to null in
 I intend to rectify this issue in the future by injecting the required instructions when they do not exist.
 
 To workaround this just set any value on the field and it will be replaced.
-
-This package relies on [Fody](https://github.com/Fody/Fody)
