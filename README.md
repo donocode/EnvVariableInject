@@ -1,6 +1,6 @@
 # EnvVariableInject for Fody
 
-EnvVariableInject can be used to inject the values of Environment Variables into 
+EnvVariableInject can be used to inject the values of Environment Variables into
 fields at build time, this can be useful for injecting build numbers, secret test config values
 or anything that you might not want to store in your code.
 
@@ -36,7 +36,9 @@ public int TestInt = 200;
 public double TestDouble = 99.99;
 ```
 
-The `BuildTimeEnvironmentVariableAttribute` should be added to your project
+Replacement will work for fields, static fields and static readonly fields.
+
+The `BuildTimeEnvironmentVariableAttribute` is added to the project during nuget install.
 
 At build time the weaver will attempt to replace the field with the environment
 variable specified in the Attribute constructor
