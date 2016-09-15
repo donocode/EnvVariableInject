@@ -72,8 +72,27 @@ function UnlockWeaversXml($project)
     }   
 }
 
+function RemoveUnneededLanguageTransforms($project)
+{
+	if ($project.Type -eq "VB.NET")
+	{
+		Write-Host "Removing C# transforms"
+		$project.ProjectItems.Item("BuildTimeEnvironmentVariableAttribute.cs").Delete()
+	}
+	elseif ($project.Type -eq "C#")
+	{
+		Write-Host "Removing VB.NET transforms"
+		$project.ProjectItems.Item("BuildTimeEnvironmentVariableAttribute.vb").Delete()
+	}
+}
+
 UnlockWeaversXml($project)
 
 Update-FodyConfig $package.Id.Replace(".Fody", "") $project
+
+Write-Host "Project details"
+Write-Host $project.Type
+Write-Host $project.CodeModel.Language
+RemoveUnneededLanguageTransforms $project
 
 Fix-ReferencesCopyLocal $package $project
